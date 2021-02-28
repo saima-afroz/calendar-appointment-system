@@ -1,0 +1,19 @@
+{
+  "name": "ghl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "bootstrap-datepicker": "^1.9.0",
+    "express": "^4.17.1",
+    "firebase-admin": "^9.5.0",
+    "jquery": "^3.5.1",
+    "uuid": "^8.3.2"
+  }
+}
