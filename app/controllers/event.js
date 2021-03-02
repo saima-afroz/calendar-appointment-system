@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../../config/db');
 const https = require('https');
+const axios = require('axios');
 
 
 var dr_john_timezone_name = 'Los Angeles, CA'
@@ -66,6 +67,7 @@ router.get('/free-slots/:date/:timezone', function(req,res){
     let saved_events_time = [];
     let saved_events_date = [];
     
+    
 
     db.collection('events').get().then((snapshot) => {
         snapshot.forEach((doc) => {
@@ -109,7 +111,7 @@ router.get('/free-slots/:date/:timezone', function(req,res){
         }).on("error", (err) => {
             console.log("Error: " + err.message);
         })
-    }, 1000);
+    }, 5000);
     
 
     patient_time = entire_data.target_location.datetime.substring(entire_data.target_location.datetime.indexOf(':')-2, entire_data.target_location.datetime.indexOf(':')+6);
@@ -123,7 +125,7 @@ router.get('/free-slots/:date/:timezone', function(req,res){
     }
 
     
-    var str1 = `Dr. John living in ${entire_data.base_location.requested_location} has its timing from ${convert_to_12_format(dr_john_start_time)} to ${convert_to_12_format(dr_john_end_time)}. His slot duration is 30 minutes.<br><br> Patient is from ${req.params.timezone}. Patient time slots to be selected are ${filtered_patient_time_slots}`;
+    const str1 = `Dr. John living in ${entire_data.base_location.requested_location} has its timing from ${convert_to_12_format(dr_john_start_time)} to ${convert_to_12_format(dr_john_end_time)}. His slot duration is 30 minutes.<br><br> Patient is from ${req.params.timezone}. Patient time slots to be selected are ${filtered_patient_time_slots}`;
 
     res.send(str1);
     
@@ -132,7 +134,6 @@ router.get('/free-slots/:date/:timezone', function(req,res){
 
 let get_all_events = [];
 db.collection('events').get().then((snapshot) => {
-    
     snapshot.forEach((doc) => {
         let each_event = {event_time: '', event_name: '', event_date: ''}
         each_event.event_time = doc.data().time;
@@ -144,24 +145,44 @@ db.collection('events').get().then((snapshot) => {
     console.log(err)
 })
 
+
 // create event - incomplete
 router.get('/create-event/:duration/:date_time', (req, res) => {
 
+    let result =  ``;
+    let status;
+
     let duration = req.params.duration;
     let date_time = req.params.date_time;
+    let name = 'tenth event';
     
-    let date;
-    let time;
-    date_time = date +"&"+ time;
-
-
-    eventRef.add({
-        'name': 'tenth event',
-        'time': time,
-        'date': date
-    })
-
-    res.send(get_all_events);
+    let date = date_time.substring(0,10);
+    let time = date_time.substring(11, 19);  
+    
+    for(let i = 0; i<get_all_events.length; i++){
+        
+        if((get_all_events[i].event_date === date) && (get_all_events[i].event_time === time)){
+            console.log("yes")
+            result = `This slot is already booked.`;
+            status = 'yes'
+            break;
+        } else {
+            
+            console.log("no");
+            status = 'no';
+            result = `The event created is of ${duration} minutes on ${date} at ${time}.`;
+        }
+    }
+    if(status == 'no'){
+        eventRef.add({
+            'name': name,
+            'time': time,
+            'date': date
+        })
+        get_all_events.push({event_time: time, event_date: date, event_name: name});
+        console.log(get_all_events);
+    }
+    res.send(result);
 })
 
 // get all events
