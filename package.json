@@ -12,7 +12,7 @@
     "axios": "^0.21.1",
     "bootstrap-datepicker": "^1.9.0",
     "express": "^4.17.1",
-    "firebase-admin": "^9.5.0",
+    "firebase-admin": "^11.4.1",
     "jquery": "^3.5.1",
     "uuid": "^8.3.2"
   }
